@@ -5,7 +5,6 @@ import "package:base/src/dimensions.dart";
 import "package:base/src/navigators.dart";
 import "package:flutter/material.dart";
 import "package:get/get.dart";
-import "package:jiffy/jiffy.dart";
 import "package:syncfusion_flutter_datepicker/datepicker.dart";
 import "package:easy_localization/easy_localization.dart" as el;
 
@@ -111,48 +110,47 @@ class BaseDialogs {
     }
   }
 
-  static Future<dynamic> month({
-    required Jiffy? jiffy,
-    required void Function(Jiffy selectedMonth) onSelected,
-  }) async {
-    if (Get.context != null) {
-      await showDialog(
-        context: Get.context!,
-        barrierDismissible: true,
-        builder: (context) {
-          return Dialog(
-            child: Container(
-              padding: EdgeInsets.all(Dimensions.size20),
-              width: Dimensions.size100 * 3,
-              height: Dimensions.size100 * 4,
-              child: SfDateRangePicker(
-                view: DateRangePickerView.year,
-                allowViewNavigation: false,
-                selectionMode: DateRangePickerSelectionMode.single,
-                initialDisplayDate: jiffy != null ? jiffy.dateTime : DateTime.now(),
-                initialSelectedDate: jiffy != null ? jiffy.dateTime : DateTime.now(),
-                headerStyle: DateRangePickerHeaderStyle(
-                  textAlign: TextAlign.center,
-                  backgroundColor: AppColors.surface(),
-                ),
+  static Future<void> month({
+  required DateTime? initialMonth,
+  required void Function(DateTime selectedMonth) onSelected,
+}) async {
+  if (Get.context != null) {
+    await showDialog(
+      context: Get.context!,
+      barrierDismissible: true,
+      builder: (context) {
+        return Dialog(
+          child: Container(
+            padding: EdgeInsets.all(Dimensions.size20),
+            width: Dimensions.size100 * 3,
+            height: Dimensions.size100 * 4,
+            child: SfDateRangePicker(
+              view: DateRangePickerView.year,
+              allowViewNavigation: false,
+              selectionMode: DateRangePickerSelectionMode.single,
+              initialDisplayDate: initialMonth ?? DateTime.now(),
+              initialSelectedDate: initialMonth ?? DateTime.now(),
+              headerStyle: DateRangePickerHeaderStyle(
+                textAlign: TextAlign.center,
                 backgroundColor: AppColors.surface(),
-                onCancel: () {
-                  Navigators.pop();
-                },
-                onSelectionChanged: (dateRangePickerSelectionChangedArgs) {
-                  if (dateRangePickerSelectionChangedArgs.value != null) {
-                    if (dateRangePickerSelectionChangedArgs.value is DateTime) {
-                      onSelected(Jiffy.parseFromDateTime(dateRangePickerSelectionChangedArgs.value));
-
-                      Navigators.pop();
-                    }
-                  }
-                },
               ),
+              backgroundColor: AppColors.surface(),
+              onCancel: () {
+                Navigators.pop();
+              },
+              onSelectionChanged: (dateRangePickerSelectionChangedArgs) {
+                final dynamic selected = dateRangePickerSelectionChangedArgs.value;
+                if (selected is DateTime) {
+                  final DateTime result = DateTime(selected.year, selected.month);
+                  onSelected(result);
+                  Navigators.pop();
+                }
+              },
             ),
-          );
-        },
-      );
-    }
+          ),
+        );
+      },
+    );
   }
+}
 }

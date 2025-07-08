@@ -1,13 +1,11 @@
 // ignore_for_file: avoid_function_literals_in_foreach_calls
 
 import "package:base/base.dart";
-import "package:base/src/base_date_field.dart";
 import "package:basic_utils/basic_utils.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:image_picker/image_picker.dart";
-import "package:jiffy/jiffy.dart";
 import "package:lottie/lottie.dart";
 import "package:smooth_corner/smooth_corner.dart";
 
@@ -84,103 +82,8 @@ class BaseWidgets {
     );
   }
 
-  static Widget date({
-    required String label,
-    required bool mandatory,
-    required bool readonly,
-    required TextEditingController controller,
-    Jiffy? jiffy,
-    void Function(Jiffy newValue)? onSelected,
-    bool? isDense = false,
-  }) {
-    return BaseDateField(
-      mandatory: mandatory,
-      readonly: readonly,
-      value: jiffy,
-      onSelected: onSelected,
-      label: label,
-    );
-  }
 
-  static Widget month({
-    required String label,
-    required bool mandatory,
-    required bool readonly,
-    required TextEditingController controller,
-    required Jiffy? jiffy,
-    required void Function(Jiffy newValue) onSelected,
-    bool? isDense = false,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: Dimensions.text12,
-            fontWeight: FontWeight.w700,
-            color: AppColors.onSurface().withValues(alpha: 80),
-          ),
-        ),
-        SizedBox(height: Dimensions.size5),
-        TextFormField(
-          controller: controller,
-          readOnly: true,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: AppColors.outline().withValues(alpha:0.3),
-              ),
-              borderRadius: BorderRadius.circular(Dimensions.size10),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: AppColors.outline().withValues(alpha:0.3),
-              ),
-              borderRadius: BorderRadius.circular(Dimensions.size10),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: AppColors.primary(),
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(Dimensions.size10),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: AppColors.error(),
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(Dimensions.size10),
-            ),
-            suffixIcon: const Icon(
-              Icons.event,
-            ),
-            isDense: isDense,
-          ),
-          validator: (String? value) {
-            if (mandatory) {
-              if (jiffy == null) {
-                return "this_field_is_required".tr();
-              }
-            }
 
-            return null;
-          },
-          onTap: !readonly ? () async {
-            await BaseDialogs.month(
-              jiffy: jiffy,
-              onSelected: (newValue) {
-                controller.text = newValue.format(pattern: "MMMM yyyy");
-
-                onSelected(newValue);
-              },
-            );
-          } : null,
-        ),
-      ],
-    );
-  }
 
   static Widget spinner({
     required bool mandatory,

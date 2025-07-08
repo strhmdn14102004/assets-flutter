@@ -2,17 +2,16 @@ import 'package:base/base.dart';
 import 'package:basic_utils/basic_utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:smooth_corner/smooth_corner.dart';
 
 class BaseDateField extends StatefulWidget {
   final bool mandatory;
   final bool readonly;
-  final Jiffy? value;
-  void Function(Jiffy newValue)? onSelected;
-  String? label;
+  final DateTime? value;
+  final void Function(DateTime newValue)? onSelected;
+  final String? label;
 
-  BaseDateField({
+  const BaseDateField({
     super.key,
     required this.mandatory,
     required this.readonly,
@@ -28,16 +27,13 @@ class BaseDateField extends StatefulWidget {
 class BaseDateFieldState extends State<BaseDateField> {
   @override
   Widget build(BuildContext context) {
-    return FormField<Jiffy>(
+    return FormField<DateTime>(
       initialValue: widget.value,
       enabled: !widget.readonly,
       validator: (value) {
-        if (widget.mandatory) {
-          if (widget.value == null) {
-            return "this_field_is_required".tr();
-          }
+        if (widget.mandatory && widget.value == null) {
+          return "this_field_is_required".tr();
         }
-
         return null;
       },
       builder: (field) {
@@ -47,19 +43,20 @@ class BaseDateFieldState extends State<BaseDateField> {
             labelWidget(),
             Material(
               child: InkWell(
-                onTap: !widget.readonly ? () async {
-                  await BaseSheets.date(
-                    jiffy: widget.value,
-                    max: Jiffy.parseFromDateTime(DateTime(2099, 12, 31)),
-                    onSelected: (newValue) {
-                      if (widget.onSelected != null) {
-                        widget.onSelected!(newValue);
-
-                        setState(() {});
+                onTap: !widget.readonly
+                    ? () async {
+                        await BaseSheets.date(
+                          initialDate: widget.value,
+                          maxDate: DateTime(2099, 12, 31),
+                          onSelected: (newValue) {
+                            if (widget.onSelected != null) {
+                              widget.onSelected!(newValue);
+                              setState(() {});
+                            }
+                          },
+                        );
                       }
-                    },
-                  );
-                } : null,
+                    : null,
                 customBorder: SmoothRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   smoothness: 1,
@@ -77,24 +74,19 @@ class BaseDateFieldState extends State<BaseDateField> {
                     ),
                     color: AppColors.surfaceContainerLowest(),
                   ),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: Dimensions.size15,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: Dimensions.size15),
                   child: Row(
                     children: [
                       Expanded(
                         child: Text(
-                          widget.value?.format(pattern: "d MMM 'yy") ?? "",
-                          style: TextStyle(
-                            fontSize: Dimensions.text16,
-                          ),
+                          widget.value != null
+                              ? DateFormat("d MMM ''yy").format(widget.value!)
+                              : "",
+                          style: TextStyle(fontSize: Dimensions.text16),
                         ),
                       ),
                       SizedBox(width: Dimensions.size10),
-                      Icon(
-                        Icons.event,
-                        size: Dimensions.size20,
-                      )
+                      Icon(Icons.event, size: Dimensions.size20),
                     ],
                   ),
                 ),
@@ -110,35 +102,27 @@ class BaseDateFieldState extends State<BaseDateField> {
   Widget labelWidget() {
     if (StringUtils.isNotNullOrEmpty(widget.label)) {
       return Container(
-        margin: EdgeInsets.only(
-          bottom: Dimensions.size5,
-        ),
+        margin: EdgeInsets.only(bottom: Dimensions.size5),
         child: Text(
           "${widget.label}${widget.mandatory ? "*" : ""}",
           style: TextStyle(
             fontSize: Dimensions.text12,
             fontWeight: FontWeight.w700,
-            color: AppColors.onSurface().withValues(alpha: 80),
+            color: AppColors.onSurface().withAlpha(80),
           ),
         ),
       );
     }
-
     return const SizedBox.shrink();
   }
 
   Widget errorWidget(FormFieldState field) {
     if (field.hasError) {
       return Container(
-        margin: EdgeInsets.only(
-          top: Dimensions.size5,
-        ),
+        margin: EdgeInsets.only(top: Dimensions.size5),
         child: Row(
           children: [
-            Icon(
-              Icons.error,
-              color: AppColors.error(),
-            ),
+            Icon(Icons.error, color: AppColors.error()),
             SizedBox(width: Dimensions.size5),
             Expanded(
               child: Text(
@@ -154,19 +138,16 @@ class BaseDateFieldState extends State<BaseDateField> {
         ),
       );
     }
-
     return const SizedBox.shrink();
   }
 
   Color borderColor(FormFieldState field) {
     if (widget.readonly) {
       return AppColors.surfaceDim();
+    } else if (field.hasError) {
+      return AppColors.error();
     } else {
-      if (field.hasError) {
-        return AppColors.error();
-      } else {
-        return AppColors.outline();
-      }
+      return AppColors.outline();
     }
   }
 }

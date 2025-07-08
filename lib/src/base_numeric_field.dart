@@ -1,8 +1,10 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:base/base.dart';
 import 'package:basic_utils/basic_utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:pattern_formatter/pattern_formatter.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:smooth_corner/smooth_corner.dart';
 
 class BaseNumericField extends StatefulWidget {
@@ -44,9 +46,18 @@ class BaseNumericField extends StatefulWidget {
 }
 
 class BaseNumericFieldState extends State<BaseNumericField> {
+  late final NumberFormat numberFormat;
+  late final MaskTextInputFormatter formatter;
+
   @override
   void initState() {
     super.initState();
+    numberFormat = NumberFormat.decimalPattern("id_ID");
+    formatter = MaskTextInputFormatter(
+      mask: '#,###',
+      filter: {"#": RegExp(r'[0-9]')},
+      type: MaskAutoCompletionType.lazy,
+    );
   }
 
   @override
@@ -54,15 +65,15 @@ class BaseNumericFieldState extends State<BaseNumericField> {
     return FormField<num>(
       initialValue: tryParse(widget.controller.text),
       enabled: !widget.readonly,
-      validator: widget.validator ?? (num? value) {
-        if (widget.mandatory) {
-          if (value == null) {
-            return "this_field_is_required".tr();
-          }
-        }
-
-        return null;
-      },
+      validator: widget.validator ??
+          (num? value) {
+            if (widget.mandatory) {
+              if (value == null || value == 0) {
+                return "this_field_is_required".tr();
+              }
+            }
+            return null;
+          },
       onSaved: widget.onSaved,
       builder: (field) {
         return Column(
@@ -77,7 +88,7 @@ class BaseNumericFieldState extends State<BaseNumericField> {
                   borderRadius: BorderRadius.circular(12),
                   smoothness: 1,
                   side: BorderSide(
-                      color: borderColor(field),
+                    color: borderColor(field),
                   ),
                 ),
                 color: AppColors.surfaceContainerLowest(),
@@ -92,26 +103,26 @@ class BaseNumericFieldState extends State<BaseNumericField> {
                 readOnly: widget.readonly,
                 textAlign: widget.textAlign,
                 enabled: widget.enabled,
-                inputFormatters: [
-                  ThousandsFormatter(
-                    allowFraction: true,
-                    formatter: NumberFormat.decimalPattern("id_ID"),
-                  ),
-                ],
+                inputFormatters: [formatter],
                 decoration: InputDecoration(
-                  border: const OutlineInputBorder(borderSide: BorderSide(color: Colors.transparent)),
-                  enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.transparent)),
-                  focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.transparent)),
-                  errorBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.transparent)),
+                  border: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent)),
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent)),
+                  focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent)),
+                  errorBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent)),
                   prefixIcon: widget.prefixIcon,
                   suffix: widget.suffix,
                   suffixIcon: widget.suffixIcon,
                 ),
-                onChanged: widget.onChanged ?? (value) {
-                  setState(() {
-                    field.didChange(tryParse(value));
-                  });
-                },
+                onChanged: widget.onChanged ??
+                    (value) {
+                      setState(() {
+                        field.didChange(tryParse(value));
+                      });
+                    },
               ),
             ),
             errorWidget(field),
@@ -186,9 +197,9 @@ class BaseNumericFieldState extends State<BaseNumericField> {
 
   static num tryParse(String value) {
     try {
-      return NumberFormat("", "id").parse(value);
+      return NumberFormat.decimalPattern("id_ID").parse(value);
     } catch (ignored) {
-      return num.tryParse(value) ?? 0;
+      return num.tryParse(value.replaceAll(",", "")) ?? 0;
     }
   }
 }

@@ -2,7 +2,6 @@
 
 import "package:easy_localization/easy_localization.dart";
 import "package:flutter/material.dart";
-import "package:jiffy/jiffy.dart";
 
 extension StringExtension on String {
   String truncateTo(int maxLength) => (length <= maxLength) ? this : '${substring(0, maxLength)}...';
@@ -39,18 +38,7 @@ extension Unique<E, Id> on List<E> {
   }
 }
 
-extension JiffyExtension on Jiffy {
-  static Jiffy min = Jiffy.parseFromDateTime(DateTime(1900, 1, 1));
-  static Jiffy max = Jiffy.parseFromDateTime(DateTime(2099, 12, 31));
 
-  String dateFormat() {
-    return format(pattern: "yyyy-MM-dd");
-  }
-
-  String dateTimeFormat() {
-    return format(pattern: "yyyy-MM-dd HH:mm");
-  }
-}
 
 extension NumberExtension on num {
   String currency() {

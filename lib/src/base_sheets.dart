@@ -406,6 +406,85 @@
         }
       }
     }
+static Future<bool?> confirm({
+  required BuildContext context,
+  required String title,
+  required String message,
+  String yesText = "Ya",
+  String noText = "Batal",
+}) async {
+  return await showDialog<bool>(
+    context: context,
+    barrierDismissible: true,
+    builder: (context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Dimensions.size20),
+        ),
+        child: SmoothClipRRect(
+          smoothness: 1,
+          borderRadius: BorderRadius.circular(Dimensions.size20),
+          side: BorderSide(color: AppColors.outline()),
+          child: Container(
+            padding: EdgeInsets.all(Dimensions.size20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: Dimensions.text18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.onSurface(),
+                  ),
+                ),
+                SizedBox(height: Dimensions.size10),
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: Dimensions.text14,
+                    color: AppColors.onSurface().withValues(alpha: 0.8),
+                  ),
+                ),
+                SizedBox(height: Dimensions.size25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigators.pop(result: false);
+                      },
+                      child: Text(
+                        noText,
+                        style: const TextStyle(
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: Dimensions.size10),
+                    FilledButton(
+                      onPressed: () {
+                        Navigators.pop(result: true);
+                      },
+                      child: Text(
+                        yesText,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
 
     static Future<dynamic> menu({
       required List<MenuItem> menuItems,

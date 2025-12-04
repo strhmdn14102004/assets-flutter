@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:base/base.dart';
 import 'package:basic_utils/basic_utils.dart';
 import 'package:collection/collection.dart';
